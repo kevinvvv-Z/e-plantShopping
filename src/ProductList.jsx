@@ -1,9 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import './ProductList.css'
+import React, { useState } from 'react';
+import './ProductList.css';
 import CartItem from './CartItem';
+import { useDispatch, useSelector } from 'react-redux';
+import { addItem } from './CartSlice';
+
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
-    const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
+    const [showPlants, setShowPlants] = useState(false);
+    const [addedToCart, setAddedToCart] = useState({});
+    const dispatch = useDispatch();
+
+    const cartItems = useSelector(state => state.cart.items);
+
+    const calculateTotalQuantity = () => {
+        return cartItems ? cartItems.reduce((total, item) => total + item.quantity, 0) : 0;
+    };
 
     const plantsArray = [
         {
@@ -58,7 +69,7 @@ function ProductList({ onHomeClick }) {
                 },
                 {
                     name: "Jasmine",
-                    image: "https://images.unsplash.com/photo-1592729645009-b96d1e63d14b?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                    image: "https://images.unsplash.com/photo-1592729961287-3914a2a1a8e1?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                     description: "Sweet fragrance, promotes relaxation.",
                     cost: "$18"
                 },
@@ -99,7 +110,7 @@ function ProductList({ onHomeClick }) {
                 },
                 {
                     name: "Marigold",
-                    image: "https://cdn.pixabay.com/photo/2022/02/22/05/45/marigold-7028063_1280.jpg",
+                    image: "https://cdn.pixabay.com/photo/2022/02/22/01/04/marigold-7028063_1280.jpg",
                     description: "Natural insect repellent, also adds color to the garden.",
                     cost: "$8"
                 },
@@ -141,7 +152,7 @@ function ProductList({ onHomeClick }) {
                 {
                     name: "Echinacea",
                     image: "https://cdn.pixabay.com/photo/2014/12/05/03/53/echinacea-557477_1280.jpg",
-                    description: "Boosts immune system, helps fight colds.",
+                    description: "Boosts immunity, often used for colds.",
                     cost: "$16"
                 },
                 {
@@ -153,19 +164,19 @@ function ProductList({ onHomeClick }) {
                 {
                     name: "Lemon Balm",
                     image: "https://cdn.pixabay.com/photo/2019/09/16/07/41/balm-4480134_1280.jpg",
-                    description: "Calms nerves and promotes relaxation.",
+                    description: "Calms nerves and promotes sleep.",
                     cost: "$14"
                 },
                 {
                     name: "Chamomile",
                     image: "https://cdn.pixabay.com/photo/2016/08/19/19/48/flowers-1606041_1280.jpg",
-                    description: "Soothes anxiety and promotes sleep.",
+                    description: "Soothes anxiety and aids digestion.",
                     cost: "$15"
                 },
                 {
                     name: "Calendula",
-                    image: "https://cdn.pixabay.com/photo/2019/07/15/18/28/flowers-4340127_1280.jpg",
-                    description: "Heals wounds and soothes skin irritations.",
+                    image: "https://cdn.pixabay.com/photo/2019/07/15/18/28/marigold-4340401_1280.jpg",
+                    description: "Heals wounds and reduces inflammation.",
                     cost: "$12"
                 }
             ]
@@ -182,19 +193,19 @@ function ProductList({ onHomeClick }) {
                 {
                     name: "Pothos",
                     image: "https://cdn.pixabay.com/photo/2018/11/15/10/32/plants-3816945_1280.jpg",
-                    description: "Tolerates neglect and can grow in various conditions.",
+                    description: "Tolerates neglect and can grow in various light conditions.",
                     cost: "$10"
                 },
                 {
                     name: "Snake Plant",
                     image: "https://cdn.pixabay.com/photo/2021/01/22/06/04/snake-plant-5939187_1280.jpg",
-                    description: "Needs infrequent watering and is resilient to most pests.",
+                    description: "Needs infrequent watering and thrives in most lighting.",
                     cost: "$15"
                 },
                 {
                     name: "Cast Iron Plant",
                     image: "https://cdn.pixabay.com/photo/2017/02/16/18/04/cast-iron-plant-2072008_1280.jpg",
-                    description: "Hardy plant that tolerates low light and neglect.",
+                    description: "Extremely hardy, can tolerate low light and neglect.",
                     cost: "$20"
                 },
                 {
@@ -212,46 +223,61 @@ function ProductList({ onHomeClick }) {
             ]
         }
     ];
+
     const styleObj = {
         backgroundColor: '#4CAF50',
         color: '#fff!important',
         padding: '15px',
         display: 'flex',
         justifyContent: 'space-between',
-        alignIems: 'center',
+        alignItems: 'center',
         fontSize: '20px',
-    }
+    };
+
     const styleObjUl = {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         width: '1100px',
-    }
+    };
+
     const styleA = {
         color: 'white',
         fontSize: '30px',
         textDecoration: 'none',
-    }
+    };
 
     const handleHomeClick = (e) => {
         e.preventDefault();
-        onHomeClick();
+        if (onHomeClick) {
+            onHomeClick(e);
+        }
     };
 
     const handleCartClick = (e) => {
         e.preventDefault();
-        setShowCart(true); // Set showCart to true when cart icon is clicked
+        setShowCart(true);
     };
+
     const handlePlantsClick = (e) => {
         e.preventDefault();
-        setShowPlants(true); // Set showAboutUs to true when "About Us" link is clicked
-        setShowCart(false); // Hide the cart when navigating to About Us
+        setShowPlants(true);
+        setShowCart(false);
     };
 
     const handleContinueShopping = (e) => {
         e.preventDefault();
         setShowCart(false);
     };
+
+    const handleAddToCart = (plant) => {
+        dispatch(addItem(plant));
+        setAddedToCart((prevState) => ({
+            ...prevState,
+            [plant.name]: true,
+        }));
+    };
+
     return (
         <div>
             <div className="navbar" style={styleObj}>
@@ -265,17 +291,53 @@ function ProductList({ onHomeClick }) {
                             </div>
                         </a>
                     </div>
-
                 </div>
                 <div style={styleObjUl}>
-                    <div> <a href="#" onClick={(e) => handlePlantsClick(e)} style={styleA}>Plants</a></div>
-                    <div> <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}><h1 className='cart'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68"><rect width="156" height="156" fill="none"></rect><circle cx="80" cy="216" r="12"></circle><circle cx="184" cy="216" r="12"></circle><path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" id="mainIconPathAttribute"></path></svg></h1></a></div>
+                    <div>
+                        <a href="#" onClick={(e) => handlePlantsClick(e)} style={styleA}>Plants</a>
+                    </div>
+                    <div>
+                        <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}>
+                            <h1 className='cart'>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68">
+                                    <rect width="156" height="156" fill="none"></rect>
+                                    <circle cx="80" cy="216" r="12"></circle>
+                                    <circle cx="184" cy="216" r="12"></circle>
+                                    <path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" id="mainIconPathAttribute"></path>
+                                </svg>
+                                <span className="cart_quantity_count">{calculateTotalQuantity()}</span>
+                            </h1>
+                        </a>
+                    </div>
                 </div>
             </div>
             {!showCart ? (
                 <div className="product-grid">
-
-
+                    {plantsArray.map((category, index) => (
+                        <div key={index} className="category-section">
+                            <h1 className="plant_heading">
+                                <div>{category.category}</div>
+                            </h1>
+                            <div className="product-list">
+                                {category.plants.map((plant, plantIndex) => (
+                                    <div className="product-card" key={plantIndex}>
+                                        <img className="product-image" src={plant.image} alt={plant.name} />
+                                        <div className="product-title">{plant.name}</div>
+                                        <div className="product-description">{plant.description}</div>
+                                        <div className="product-cost">{plant.cost}</div>
+                                        <button
+                                            className="product-button"
+                                            style={{ backgroundColor: addedToCart[plant.name] ? 'gray' : '' }}
+                                            disabled={addedToCart[plant.name]}
+                                            onClick={() => handleAddToCart(plant)}
+                                        >
+                                            {addedToCart[plant.name] ? 'Added to Cart' : 'Add to Cart'}
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             ) : (
                 <CartItem onContinueShopping={handleContinueShopping} />
